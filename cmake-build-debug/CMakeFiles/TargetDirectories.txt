@@ -1,0 +1,3 @@
+/Users/Mac/CLionProjects/SearchNCheck/cmake-build-debug/CMakeFiles/SearchNCheck.dir
+/Users/Mac/CLionProjects/SearchNCheck/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/Mac/CLionProjects/SearchNCheck/cmake-build-debug/CMakeFiles/rebuild_cache.dir
