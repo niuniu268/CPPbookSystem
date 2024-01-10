@@ -6,7 +6,7 @@
 // ContactInformation struct represents the contact information
 struct ContactInformation {
     std::string Firstname;
-    std::string Lastname;
+    std::string Password;
 };
 
 // Users class represents the users with contact information
@@ -23,9 +23,9 @@ public:
     // Member function to prompt the user to choose a search method
     void Seek();
 
-    // Member functions for searching by firstname, lastname, and free searching
+    // Member functions for searching by firstname, Password, and free searching
     void FirstnameSeek();
-    void LastnameSeek();
+    void PasswordSeek();
     void FreeSeek();
 
     // Member function to display the search results
@@ -73,7 +73,7 @@ void OutputTextFile(const std::vector<ContactInformation>& data) {
     }
 
     for (const auto& ci : data) {
-        file << ci.Firstname << "," << ci.Lastname << "\n";
+        file << ci.Firstname << "," << ci.Password << "\n";
     }
 
     file.close();
@@ -143,18 +143,18 @@ void Users::Add() {
     ContactInformation contactInfo;
     std::cout << "Firstname: ";
     std::cin >> contactInfo.Firstname;
-    std::cout << "Lastname: ";
-    std::cin >> contactInfo.Lastname;
+    std::cout << "Password: ";
+    std::cin >> contactInfo.Password;
 
     Data.push_back(contactInfo);
 
     std::cout << "New contact information added:" << std::endl;
-    std::cout << contactInfo.Firstname << "," << contactInfo.Lastname << std::endl;
+    std::cout << contactInfo.Firstname << "," << contactInfo.Password << std::endl;
 }
 
 void Users::Seek() {
     std::cout << "1. Search by firstname" << std::endl;
-    std::cout << "2. Search by lastname" << std::endl;
+    std::cout << "2. Search by Password" << std::endl;
     std::cout << "3. Free searching" << std::endl;
 
     int option;
@@ -166,7 +166,7 @@ void Users::Seek() {
             FirstnameSeek();
             break;
         case 2:
-            LastnameSeek();
+            PasswordSeek();
             break;
         case 3:
             FreeSeek();
@@ -190,15 +190,15 @@ void Users::FirstnameSeek() {
     ShowSearchedItem(results);
 }
 
-void Users::LastnameSeek() {
-    std::string lastname;
-    std::cout << "Enter lastname: ";
-    std::cin >> lastname;
+void Users::PasswordSeek() {
+    std::string Password;
+    std::cout << "Enter Password: ";
+    std::cin >> Password;
 
     std::vector<ContactInformation> results;
     std::copy_if(Data.begin(), Data.end(), std::back_inserter(results),
-                 [lastname](const ContactInformation& ci) {
-                     return ci.Lastname == lastname;
+                 [Password](const ContactInformation& ci) {
+                     return ci.Password == Password;
                  });
 
     ShowSearchedItem(results);
@@ -213,7 +213,7 @@ void Users::FreeSeek() {
     std::copy_if(Data.begin(), Data.end(), std::back_inserter(results),
                  [search](const ContactInformation& ci) {
                      return ci.Firstname.find(search) != std::string::npos ||
-                            ci.Lastname.find(search) != std::string::npos;
+                            ci.Password.find(search) != std::string::npos;
                  });
 
     ShowSearchedItem(results);
@@ -225,7 +225,7 @@ void Users::ShowSearchedItem(const std::vector<ContactInformation>& results) {
     } else {
         std::cout << "Search results:" << std::endl;
         for (const auto& ci : results) {
-            std::cout << ci.Firstname << "," << ci.Lastname << std::endl;
+            std::cout << ci.Firstname << "," << ci.Password << std::endl;
         }
     }
 }
