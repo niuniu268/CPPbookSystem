@@ -5,7 +5,7 @@
 
 // ContactInformation struct represents the contact information
 struct ContactInformation {
-    std::string Firstname;
+    std::string Username;
     std::string Password;
 };
 
@@ -23,13 +23,16 @@ public:
     // Member function to prompt the user to choose a search method
     void Seek();
 
-    // Member functions for searching by firstname, Password, and free searching
-    void FirstnameSeek();
+    // Member functions for searching by Username, Password, and free searching
+    void UsernameSeek();
     void PasswordSeek();
     void FreeSeek();
 
     // Member function to display the search results
-    void ShowSearchedItem(const std::vector<ContactInformation>& results);
+    static void ShowSearchedItem(const std::vector<ContactInformation>& results);
+
+    // Member function to write data to a file
+    void OutputTextFile() const;
 };
 
 // GuestUsers class represents guest users
@@ -64,51 +67,29 @@ std::vector<ContactInformation> InputText() {
     return data;
 }
 
-// Function to write data to a file
-void OutputTextFile(const std::vector<ContactInformation>& data) {
-    std::ofstream file("/Users/Mac/CLionProjects/SearchNCheck/database.txt");
-    if (!file.is_open()) {
-        std::cerr << "Error opening file 1." << std::endl;
-        exit(EXIT_FAILURE);
-    }
-
-    for (const auto& ci : data) {
-        file << ci.Firstname << "," << ci.Password << "\n";
-    }
-
-    file.close();
-}
-
 // Main function
 int main() {
     std::vector<ContactInformation> data = InputText();
 
     while (true) {
         std::cout << "Which account do you want to use?" << std::endl;
-        std::cout << "1. Guest users" << std::endl;
-        std::cout << "2. Administrator" << std::endl;
-        std::cout << "3. Quit" << std::endl;
+        std::cout << "1. Users" << std::endl;
+        std::cout << "2. Quit" << std::endl;
 
         int option;
         std::cout << "Choose an option: ";
         std::cin >> option;
 
+        Users users;
+        users.Data = data;
+
         switch (option) {
-            case 1: {
-                GuestUsers guestUsers;
-                guestUsers.Data = data;
-                guestUsers.Questions();
+            case 1:
+                users.Questions();
                 break;
-            }
-            case 2: {
-                Administrator administrator;
-                administrator.Data = data;
-                administrator.Questions();
-                break;
-            }
-            case 3:
+            case 2:
                 // Save data to a file before exiting
-                OutputTextFile(data);
+                users.OutputTextFile();
                 return 0;
             default:
                 std::cout << "Invalid option" << std::endl;
@@ -141,19 +122,21 @@ void Users::Questions() {
 
 void Users::Add() {
     ContactInformation contactInfo;
-    std::cout << "Firstname: ";
-    std::cin >> contactInfo.Firstname;
+    std::cout << "Username: ";
+    std::cin >> contactInfo.Username;
     std::cout << "Password: ";
     std::cin >> contactInfo.Password;
 
     Data.push_back(contactInfo);
 
     std::cout << "New contact information added:" << std::endl;
-    std::cout << contactInfo.Firstname << "," << contactInfo.Password << std::endl;
+    std::cout << contactInfo.Username << "," << contactInfo.Password << std::endl;
+
+    OutputTextFile();  // Save changes to the file
 }
 
 void Users::Seek() {
-    std::cout << "1. Search by firstname" << std::endl;
+    std::cout << "1. Search by Username" << std::endl;
     std::cout << "2. Search by Password" << std::endl;
     std::cout << "3. Free searching" << std::endl;
 
@@ -163,7 +146,7 @@ void Users::Seek() {
 
     switch (option) {
         case 1:
-            FirstnameSeek();
+            UsernameSeek();
             break;
         case 2:
             PasswordSeek();
@@ -176,15 +159,15 @@ void Users::Seek() {
     }
 }
 
-void Users::FirstnameSeek() {
-    std::string firstname;
-    std::cout << "Enter firstname: ";
-    std::cin >> firstname;
+void Users::UsernameSeek() {
+    std::string Username;
+    std::cout << "Enter Username: ";
+    std::cin >> Username;
 
     std::vector<ContactInformation> results;
     std::copy_if(Data.begin(), Data.end(), std::back_inserter(results),
-                 [firstname](const ContactInformation& ci) {
-                     return ci.Firstname == firstname;
+                 [Username](const ContactInformation& ci) {
+                     return ci.Username == Username;
                  });
 
     ShowSearchedItem(results);
@@ -212,7 +195,7 @@ void Users::FreeSeek() {
     std::vector<ContactInformation> results;
     std::copy_if(Data.begin(), Data.end(), std::back_inserter(results),
                  [search](const ContactInformation& ci) {
-                     return ci.Firstname.find(search) != std::string::npos ||
+                     return ci.Username.find(search) != std::string::npos ||
                             ci.Password.find(search) != std::string::npos;
                  });
 
@@ -225,7 +208,21 @@ void Users::ShowSearchedItem(const std::vector<ContactInformation>& results) {
     } else {
         std::cout << "Search results:" << std::endl;
         for (const auto& ci : results) {
-            std::cout << ci.Firstname << "," << ci.Password << std::endl;
+            std::cout << ci.Username << "," << ci.Password << std::endl;
         }
     }
+}
+
+void Users::OutputTextFile() const {
+    std::ofstream file("/Users/Mac/CLionProjects/SearchNCheck/database.txt");
+    if (!file.is_open()) {
+        std::cerr << "Error opening file for writing." << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    for (const auto& ci : Data) {
+        file << ci.Username << "," << ci.Password << "\n";
+    }
+
+    file.close();
 }
